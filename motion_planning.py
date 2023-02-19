@@ -124,9 +124,9 @@ class MotionPlanning(Drone):
         # TODO: set home position to (lon0, lat0, 0)
 
         # TODO: retrieve current global position
- 
-        # TODO: convert to current local position using global_to_local()
         
+        # TODO: convert to current local position using global_to_local()
+
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
                                                                          self.local_position))
         # Read in obstacle map
