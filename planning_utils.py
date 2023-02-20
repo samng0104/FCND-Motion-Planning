@@ -1,7 +1,7 @@
 from enum import Enum
 from queue import PriorityQueue
 import numpy as np
-
+import re
 
 def create_grid(data, drone_altitude, safety_distance):
     """
@@ -144,3 +144,11 @@ def a_star(grid, h, start, goal):
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+def convert_file(file):
+    with open(file) as csv:
+        row = csv.readline()
+    match = re.match(r'^lat0 (.*), lon0 (.*)$', row)
+    if match:
+        lat = match.group(1)
+        lon = match.group(2)
+    return np.fromstring(f'{lat},{lon}', dtype='Float64', sep=',')
