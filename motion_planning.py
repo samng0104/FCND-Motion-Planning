@@ -123,10 +123,13 @@ class MotionPlanning(Drone):
         colliders = np.genfromtxt('colliders.csv', delimiter=',', dtype='str', replace_space=',', max_rows=1)
         lat0 = float(colliders[0].split()[1])
         lon0 = float(colliders[1].split()[1])
+        
         # TODO: set home position to (lon0, lat0, 0)
         self.set_home_position(lon0, lat0, 0)
+        
         # TODO: retrieve current global position
         current_global_position = self.global_position
+        
         # TODO: convert to current local position using global_to_local()
         current_local_position = global_to_local(current_global_position, self.global_home)
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
@@ -149,6 +152,7 @@ class MotionPlanning(Drone):
         print('Local Start and Goal: ', grid_start, grid_goal)
         # Using A* Search Algorithm
         path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+        
         # Using Iterative Deepening A* Search Algorithm
         # path, _ = iterative_astar(grid, heuristic, grid_start, grid_goal)
 

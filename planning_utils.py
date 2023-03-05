@@ -297,12 +297,3 @@ def chebyshev_distance(position, goal_position):
     dx = abs(position[0] - goal_position[0])
     dy = abs(position[1] - goal_position[1])
     return max(dx, dy)
-
-def convert_file(file):
-    with open(file) as csv:
-        row = csv.readline()
-    match = re.match(r'^lat0 (.*), lon0 (.*)$', row)
-    if match:
-        lat = match.group(1)
-        lon = match.group(2)
-    return np.fromstring(f'{lat},{lon}', dtype='Float64', sep=',')
