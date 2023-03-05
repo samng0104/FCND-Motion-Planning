@@ -153,7 +153,7 @@ class MotionPlanning(Drone):
         # path, _ = iterative_astar(grid, heuristic, grid_start, grid_goal)
 
         #Question 4
-        #path, _ = a_star_3_pts(grid, manhattan_distance_heuristic, grid_start, grid_goal)
+        #path, _ = a_star_3_pts(grid, manhattan_distance_heuristic, mid_goal1, mid_goal2, mid_goal3, grid_start, grid_goal)
 
         # TODO: prune path to minimize number of waypoints
         # TODO (if you're feeling ambitious): Try a different approach altogether!
