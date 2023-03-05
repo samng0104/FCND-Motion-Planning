@@ -88,7 +88,7 @@ def valid_actions(grid, current_node):
 
     return valid_actions
 
-
+#Question 2
 #iterative deepening A* search algorithm
 def iterative_astar(grid, h, start, goal):
     # we wrap the A* search in a loop that repeatedly increases the limit
@@ -151,8 +151,61 @@ def iterative_astar(grid, h, start, goal):
         # otherwise, increase the cost limit and continue the search
         cost_limit += 1
         
+# Original A* search algorithm
+# def a_star(grid, h, start, goal):
+
+#     path = []
+#     path_cost = 0
+#     queue = PriorityQueue()
+#     queue.put((0, start))
+#     visited = set(start)
+
+#     branch = {}
+#     found = False
     
-def a_star(grid, h, start, goal):
+#     while not queue.empty():
+#         item = queue.get()
+#         current_node = item[1]
+#         if current_node == start:
+#             current_cost = 0.0
+#         else:              
+#             current_cost = branch[current_node][0]
+            
+#         if current_node == goal:        
+#             print('Found a path.')
+#             found = True
+#             break
+#         else:
+#             for action in valid_actions(grid, current_node):
+#                 # get the tuple representation
+#                 da = action.delta
+#                 next_node = (current_node[0] + da[0], current_node[1] + da[1])
+#                 branch_cost = current_cost + action.cost
+#                 queue_cost = branch_cost + h(next_node, goal)
+                
+#                 if next_node not in visited:                
+#                     visited.add(next_node)               
+#                     branch[next_node] = (branch_cost, current_node, action)
+#                     queue.put((queue_cost, next_node))
+             
+#     if found:
+#         # retrace steps
+#         n = goal
+#         path_cost = branch[n][0]
+#         path.append(goal)
+#         while branch[n][1] != start:
+#             path.append(branch[n][1])
+#             n = branch[n][1]
+#         path.append(branch[n][1])
+#     else:
+#         print('**********************')
+#         print('Failed to find a path!')
+#         print('**********************') 
+#     return path[::-1], path_cost
+
+#Question 4
+#A* for 3 fixed pts
+def a_star(grid, h, start, mid_goal1, mid_goal2, mid_goal3, goal):
 
     path = []
     path_cost = 0
@@ -162,6 +215,8 @@ def a_star(grid, h, start, goal):
 
     branch = {}
     found = False
+    intermediate_goals = [mid_goal1, mid_goal2, mid_goal3]
+    current_goal_idx = 0
     
     while not queue.empty():
         item = queue.get()
@@ -171,7 +226,17 @@ def a_star(grid, h, start, goal):
         else:              
             current_cost = branch[current_node][0]
             
-        if current_node == goal:        
+        if current_node == intermediate_goals[current_goal_idx]:        
+            current_goal_idx += 1
+            if current_goal_idx == len(intermediate_goals):
+                current_goal_idx = -1
+                goal_position = goal
+            else:
+                goal_position = intermediate_goals[current_goal_idx]
+        else:
+            goal_position = intermediate_goals[current_goal_idx]
+        
+        if current_node == goal_position:        
             print('Found a path.')
             found = True
             break
@@ -181,7 +246,7 @@ def a_star(grid, h, start, goal):
                 da = action.delta
                 next_node = (current_node[0] + da[0], current_node[1] + da[1])
                 branch_cost = current_cost + action.cost
-                queue_cost = branch_cost + h(next_node, goal)
+                queue_cost = branch_cost + h(next_node, goal_position)
                 
                 if next_node not in visited:                
                     visited.add(next_node)               
@@ -190,9 +255,9 @@ def a_star(grid, h, start, goal):
              
     if found:
         # retrace steps
-        n = goal
+        n = goal_position
         path_cost = branch[n][0]
-        path.append(goal)
+        path.append(goal_position)
         while branch[n][1] != start:
             path.append(branch[n][1])
             n = branch[n][1]
@@ -204,6 +269,9 @@ def a_star(grid, h, start, goal):
     return path[::-1], path_cost
 
 
+
+
+#Question 3
 # Euclidean Distance Heuristic (default)
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
