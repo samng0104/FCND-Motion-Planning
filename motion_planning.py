@@ -120,7 +120,7 @@ class MotionPlanning(Drone):
         self.target_position[2] = TARGET_ALTITUDE
         
         # TODO: read lat0, lon0 from colliders into floating point values
-        colliders = np.genfromtxt('colliders.csv', delimeter=',', dtype='str', replace_space=',', max_rows=1)
+        colliders = np.genfromtxt('colliders.csv', delimiter=',', dtype='str', replace_space=',', max_rows=1)
         lat0 = float(colliders[0].split()[1])
         lon0 = float(colliders[1].split()[1])
         # TODO: set home position to (lon0, lat0, 0)
@@ -128,7 +128,7 @@ class MotionPlanning(Drone):
         # TODO: retrieve current global position
         current_global_position = self.global_position
         # TODO: convert to current local position using global_to_local()
-        current_local_position=global_to_local(current_global_position, self.global_home)
+        current_local_position = global_to_local(current_global_position, self.global_home)
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
                                                                          self.local_position))
         # Read in obstacle map
@@ -140,19 +140,18 @@ class MotionPlanning(Drone):
         # Define starting point on the grid (this is just grid center)
         grid_start = (-north_offset, -east_offset)
         # TODO: convert start position to current position rather than map center
-        start_position = (int(current_local_position[0]), int(current_local_position[1]), int(current_local_position[2]))
-        # Set goal as some arbitrary position on the grid        
+        
+        # Set goal as some arbitrary position on the grid
         grid_goal = (-north_offset + 10, -east_offset + 10)
-        # TODO: adapt to set goal as latitude / longitude position and convert
-####
         # Run A* to find a path from start to goal
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
-        path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+        # path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+        path, _ = iterative_astar(grid, heuristic, grid_start, grid_goal)
 
         #Question 4
-        path, _ = a_star(grid, manhattan_distance_heuristic, grid_start, grid_goal)
+        #path, _ = a_star_3_pts(grid, manhattan_distance_heuristic, grid_start, grid_goal)
 
         # TODO: prune path to minimize number of waypoints
         # TODO (if you're feeling ambitious): Try a different approach altogether!
