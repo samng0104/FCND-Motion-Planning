@@ -3,6 +3,7 @@ from queue import PriorityQueue
 import numpy as np
 import re
 
+
 def create_grid(data, drone_altitude, safety_distance):
     """
     Returns a grid representation of a 2D configuration space
@@ -203,9 +204,41 @@ def a_star(grid, h, start, goal):
     return path[::-1], path_cost
 
 
-
+# Euclidean Distance Heuristic (default)
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
+
+# Manhattan Distance Heuristic
+def manhattan_distance_heuristic(position, goal_position):
+    return abs(position[0] - goal_position[0]) + abs(position[1] - goal_position[1])
+
+# Diagonal Distance Heuristic
+def diagonal_distance_heuristic(position, goal_position):
+    dx = abs(position[0] - goal_position[0])
+    dy = abs(position[1] - goal_position[1])
+    return np.sqrt(2) * min(dx, dy) + abs(dx - dy)
+
+# Euclidean Squared Distance Heuristic
+def euclidean_squared_distance_heuristic(position, goal_position):
+    dx = position[0] - goal_position[0]
+    dy = position[1] - goal_position[1]
+    return dx*dx + dy*dy
+
+# Euclidean Distance with Weighted Edges Heuristic
+def euclidean_distance_with_weighted_edges(position, goal_position, grid):
+    dx = abs(position[0] - goal_position[0])
+    dy = abs(position[1] - goal_position[1])
+    dz = abs(position[2] - goal_position[2])
+    diagonal_distance = np.sqrt(dx**2 + dy**2 + dz**2)
+    if grid[position[0]][position[1]][position[2]] == 1:
+        return diagonal_distance + 10
+    else:
+        return diagonal_distance
+# Chebyshev Distance Heuristic
+def chebyshev_distance(position, goal_position):
+    dx = abs(position[0] - goal_position[0])
+    dy = abs(position[1] - goal_position[1])
+    return max(dx, dy)
 
 def convert_file(file):
     with open(file) as csv:
