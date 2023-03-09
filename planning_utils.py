@@ -1,6 +1,7 @@
 from enum import Enum
 from queue import PriorityQueue
 import numpy as np
+import re
 
 
 def create_grid(data, drone_altitude, safety_distance):
@@ -87,7 +88,63 @@ def valid_actions(grid, current_node):
 
     return valid_actions
 
+#Question 2
+#iterative deepening A* search algorithm
+def iterative_astar(grid, h, start, goal):
+    
+    depth_limit = 500
+    
+    path = []
+    path_cost = 0
+    queue = PriorityQueue()
+    queue.put((0, start))
+    visited = set(start)
 
+    branch = {}
+    found = False
+    
+    while not queue.empty():
+        item = queue.get()
+        current_node = item[1]
+        if current_node == start:
+            current_cost = 0.0
+        else:              
+            current_cost = branch[current_node][0]
+            
+        if current_node == goal:        
+            print('Found a path.')
+            found = True
+            break
+        else:
+            if current_cost + h(current_node, goal) <= depth_limit:
+                for action in valid_actions(grid, current_node):
+                    # get the tuple representation
+                    da = action.delta
+                    next_node = (current_node[0] + da[0], current_node[1] + da[1])
+                    branch_cost = current_cost + action.cost
+                    queue_cost = branch_cost + h(next_node, goal)
+                    
+                    if next_node not in visited:                
+                        visited.add(next_node)               
+                        branch[next_node] = (branch_cost, current_node, action)
+                        queue.put((queue_cost, next_node))
+                
+    if found:
+        # retrace steps
+        n = goal
+        path_cost = branch[n][0]
+        path.append(goal)
+        while branch[n][1] != start:
+            path.append(branch[n][1])
+            n = branch[n][1]
+        path.append(branch[n][1])
+    else:
+        print('**********************')
+        print('Failed to find a path!')
+        print('**********************') 
+    return path[::-1], path_cost
+          
+# Original A* search algorithm
 def a_star(grid, h, start, goal):
 
     path = []
@@ -139,8 +196,104 @@ def a_star(grid, h, start, goal):
         print('**********************') 
     return path[::-1], path_cost
 
+#Question 4
+#A* for 3 fixed pts
+def a_star_3_pts(grid, h, start, mid_goal1, mid_goal2, mid_goal3, goal):
 
+    path = []
+    path_cost = 0
+    queue = PriorityQueue()
+    queue.put((0, start))
+    visited = set(start)
 
+    branch = {}
+    found = False
+    intermediate_goals = [mid_goal1, mid_goal2, mid_goal3]
+    current_goal_idx = 0
+    
+    while not queue.empty():
+        item = queue.get()
+        current_node = item[1]
+        if current_node == start:
+            current_cost = 0.0
+        else:              
+            current_cost = branch[current_node][0]
+            
+        if current_node == intermediate_goals[current_goal_idx]:        
+            current_goal_idx += 1
+            if current_goal_idx == len(intermediate_goals):
+                current_goal_idx = -1
+                goal_position = goal
+            else:
+                goal_position = intermediate_goals[current_goal_idx]
+        else:
+            goal_position = intermediate_goals[current_goal_idx]
+        
+        if current_node == goal_position:        
+            print('Found a path.')
+            found = True
+            break
+        else:
+            for action in valid_actions(grid, current_node):
+                # get the tuple representation
+                da = action.delta
+                next_node = (current_node[0] + da[0], current_node[1] + da[1])
+                branch_cost = current_cost + action.cost
+                queue_cost = branch_cost + h(next_node, goal_position)
+                
+                if next_node not in visited:                
+                    visited.add(next_node)               
+                    branch[next_node] = (branch_cost, current_node, action)
+                    queue.put((queue_cost, next_node))
+             
+    if found:
+        # retrace steps
+        n = goal_position
+        path_cost = branch[n][0]
+        path.append(goal_position)
+        while branch[n][1] != start:
+            path.append(branch[n][1])
+            n = branch[n][1]
+        path.append(branch[n][1])
+    else:
+        print('**********************')
+        print('Failed to find a path!')
+        print('**********************') 
+    return path[::-1], path_cost
+
+#Question 3
+# Euclidean Distance Heuristic (default)
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+# Manhattan Distance Heuristic
+def manhattan_distance_heuristic(position, goal_position):
+    return abs(position[0] - goal_position[0]) + abs(position[1] - goal_position[1])
+
+# Diagonal Distance Heuristic
+def diagonal_distance_heuristic(position, goal_position):
+    dx = abs(position[0] - goal_position[0])
+    dy = abs(position[1] - goal_position[1])
+    return np.sqrt(2) * min(dx, dy) + abs(dx - dy)
+
+# Euclidean Squared Distance Heuristic
+def euclidean_squared_distance_heuristic(position, goal_position):
+    dx = position[0] - goal_position[0]
+    dy = position[1] - goal_position[1]
+    return dx*dx + dy*dy
+
+# Euclidean Distance with Weighted Edges Heuristic
+def euclidean_distance_with_weighted_edges(position, goal_position, grid):
+    dx = abs(position[0] - goal_position[0])
+    dy = abs(position[1] - goal_position[1])
+    dz = abs(position[2] - goal_position[2])
+    diagonal_distance = np.sqrt(dx**2 + dy**2 + dz**2)
+    if grid[position[0]][position[1]][position[2]] == 1:
+        return diagonal_distance + 10
+    else:
+        return diagonal_distance
+# Chebyshev Distance Heuristic
+def chebyshev_distance(position, goal_position):
+    dx = abs(position[0] - goal_position[0])
+    dy = abs(position[1] - goal_position[1])
+    return max(dx, dy)
